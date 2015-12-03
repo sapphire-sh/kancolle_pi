@@ -1,48 +1,49 @@
-var jsdom = require('jsdom');
+'use strict';
+
 var fs = require('fs');
+var request = require('request');
+var config = require('./config.js');
+var twit = require('twit');
+var tw = new twit(config);
 
 var flag = true;
 
-var config = JSON.parse(fs.readFileSync(__dirname + '/config.json').toString().trim());
-
 function parse() {
-	jsdom.env({
-		url: 'https://mobile.twitter.com/KanColle_STAFF/favorites',
-		done: function(err, window) {
-			var url = window.document.getElementsByClassName('avatar')[0].getElementsByTagName('img')[0].getAttribute('src').replace('_normal', '');
-			var filename = __dirname + '/data/' + url.replace('https://pbs.twimg.com/profile_images/', '').replace('/', '_');
+	request('https://mobile.twitter.com/KanColle_STAFF/favorites', function(err, res, body) {
+		if(!err && res.statusCode === 200) {
+			var str = body.match(/profile_images\/\d+\/\w+_/)[0].replace('profile_images/', '').replace('_', '');
+			var filename = __dirname + '/data/' + str.replace('/', '_') + '.png';
 			
 			var fs = require('fs');
 			if(!fs.existsSync(filename)) {
-				var request = require('request');
 				flag = false;
-				request
-				.get(url)
+				var url = 'https://pbs.twimg.com/profile_images/' + str + '.png';
+				
+				request.get(url)
 				.on('end', function(res) {
-					var media =  fs.readFileSync(filename, { encoding: 'base64' });
-					
-					var tw = require('twitter')(config.twitter);
-					tw.post('account/update_profile_image', {
-						image: media
-					}, function(err, res) {
-						if(err) {
-							console.log(err);
-						}
-					});
-					
-					tw.post('media/upload', {
-						media: media
-					}, function(err, res) {
-						if(err) {
-							console.log(err);
-						}
-						tw.post('statuses/update', {
-							media_ids: res.media_id_string
+					fs.readFile(filename, 'base64', function(err, data) {
+						tw.post('account/update_profile_image', {
+							image: data
+						}, function(err, data) {
+							if(err) {
+								console.log(err);
+							}
+						});
+						
+						tw.post('media/upload', {
+							media_data: data
 						}, function(err, res) {
 							if(err) {
 								console.log(err);
 							}
-							flag = true;
+							tw.post('statuses/update', {
+								media_ids: res.media_id_string
+							}, function(err, res) {
+								if(err) {
+									console.log(err);
+								}
+								flag = true;
+							});
 						});
 					});
 				})
@@ -50,7 +51,7 @@ function parse() {
 			}
 		}
 	});
-};
+}
 
 var count = 0;
 setInterval(function() {
@@ -59,3 +60,4 @@ setInterval(function() {
 		parse();
 	}
 }, 1000);
+
