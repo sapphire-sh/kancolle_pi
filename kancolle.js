@@ -11,7 +11,7 @@ var flag = true;
 function parse() {
 	request('https://mobile.twitter.com/KanColle_STAFF/favorites', function(err, res, body) {
 		if(!err && res.statusCode === 200) {
-			var str = body.match(/profile_images\/\d+\/\w+_/)[0].replace('profile_images/', '').replace('_', '');
+			var str = body.match(/profile_images\/\d+\/.+_/)[0].replace('profile_images/', '').replace('_', '');
 			var filename = __dirname + '/data/' + str.replace('/', '_') + '.png';
 			
 			var fs = require('fs');
