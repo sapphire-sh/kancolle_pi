@@ -11,13 +11,14 @@ var flag = true;
 function parse() {
 	request('https://mobile.twitter.com/KanColle_STAFF/favorites', function(err, res, body) {
 		if(!err && res.statusCode === 200) {
-			var str = body.match(/profile_images\/\d+\/.+_/)[0].replace('profile_images/', '').slice(0, - 1);
-			var filename = __dirname + '/data/' + str.replace('/', '_') + '.png';
+			var str = body.match(/profile_images\/\d+\/.+_.+"/)[0].replace('profile_images/', '').slice(0, - 1);
+			var ext = str.split('.')[1];
+			str = str.split('_')[0];
+			var filename = __dirname + '/data/' + str.replace('/', '_') + '.' + ext;
 			
-			var fs = require('fs');
 			if(!fs.existsSync(filename)) {
 				flag = false;
-				var url = 'https://pbs.twimg.com/profile_images/' + str + '.png';
+				var url = 'https://pbs.twimg.com/profile_images/' + str + '.' + ext;
 				
 				request.get(url)
 				.on('end', function(res) {
