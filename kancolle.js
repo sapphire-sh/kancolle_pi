@@ -11,9 +11,10 @@ var flag = true;
 function parse() {
 	request('https://mobile.twitter.com/KanColle_STAFF/favorites', function(err, res, body) {
 		if(!err && res.statusCode === 200) {
-			var str = body.match(/profile_images\/\d+\/.+_.+"/)[0].replace('profile_images/', '').slice(0, - 1);
+			var str = body.match(/profile_images\/.+"/)[0].replace('profile_images/', '').slice(0, - 1);
 			var ext = str.split('.')[1];
 			str = str.split('_')[0];
+console.log(str);
 			var filename = __dirname + '/data/' + str.replace('/', '_') + '.' + ext;
 			
 			if(!fs.existsSync(filename)) {
