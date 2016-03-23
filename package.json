@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "@KanColle_PI",
   "scripts": {
-    "start": "pm2 start kancolle.js",
-    "stop": "pm2 stop kancolle.js"
+    "start": "pm2 start ./app.json",
+    "stop": "pm2 stop ./app.json"
   },
   "repository": {
     "type": "git",

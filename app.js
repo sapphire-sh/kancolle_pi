@@ -13,8 +13,9 @@ function parse() {
 		if(!err && res.statusCode === 200) {
 			var str = body.match(/profile_images\/.+"/)[0].replace('profile_images/', '').slice(0, - 1);
 			var ext = str.split('.')[1];
-			str = str.split('_')[0];
-console.log(str);
+            var token = str.split('/');
+            str = token[0] + '/' + token[1].slice(0, 8);
+            
 			var filename = __dirname + '/data/' + str.replace('/', '_') + '.' + ext;
 			
 			if(!fs.existsSync(filename)) {
