@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/sapphiredev/kancolle_pi.git"
   },
-  "author": "sapphiredev <se.imas.kr@gmail.com>",
+  "author": "sapphire",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/sapphiredev/kancolle_pi/issues"
