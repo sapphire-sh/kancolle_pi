@@ -17,5 +17,7 @@ notifications:
   email: false
 
 after_success:
+  - rm -rf data
+  - mkdir data
   - npm run coveralls
 
