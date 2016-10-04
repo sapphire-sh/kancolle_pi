@@ -7,7 +7,7 @@ let cheerio = require('cheerio');
 
 const config = require('../config');
 let twit;
-if(process.env.NODE_ENV !== "test") {
+if(process.env.NODE_ENV !== 'test') {
 	twit = new (require('twit'))(config);
 }
 
@@ -17,7 +17,7 @@ class App {
 	constructor(test) {
 		let self = this;
 		
-		if(process.env.NODE_ENV !== "test") {
+		if(process.env.NODE_ENV !== 'test') {
 			self.parse();
 		}
 	}
@@ -44,7 +44,7 @@ class App {
 					let ext = img.split('.').pop();
 					img = `${img.split('_')[0]}.${ext}`;
 					
-					if(process.env.NODE_ENV !== "test") {
+					if(process.env.NODE_ENV !== 'test') {
 						self.fetch(img);
 					}
 					callback(true);
@@ -52,7 +52,7 @@ class App {
 			}
 			catch(e) {
 				console.log(e);
-				if(process.env.NODE_ENV !== "test") {
+				if(process.env.NODE_ENV !== 'test') {
 					setTimeout(() => {
 						self.parse();
 					}, 1000);
@@ -73,7 +73,7 @@ class App {
 			let imgPath = path.join(__dirname, '..', 'data', img.replace('/', '_'));
 			
 			if(fs.existsSync(imgPath)) {
-				if(process.env.NODE_ENV !== "test") {
+				if(process.env.NODE_ENV !== 'test') {
 					setTimeout(() => {
 						self.parse();
 					}, 1000);
@@ -87,7 +87,7 @@ class App {
 				
 				request.get(url)
 				.on('end', (res) => {
-					if(process.env.NODE_ENV !== "test") {
+					if(process.env.NODE_ENV !== 'test') {
 						self.tweet(imgPath);
 					}
 					callback(true);
@@ -97,7 +97,7 @@ class App {
 		}
 		catch(e) {
 			console.log(e);
-			if(process.env.NODE_ENV !== "test") {
+			if(process.env.NODE_ENV !== 'test') {
 				setTimeout(() => {
 					self.parse();
 				}, 1000);
@@ -115,7 +115,7 @@ class App {
 		
 		try {
 			fs.readFile(imgPath, 'base64', (err, data) => {
-				if(process.env.NODE_ENV !== "test") {
+				if(process.env.NODE_ENV !== 'test') {
 					callback(true);
 				}
 				else {
@@ -142,7 +142,7 @@ class App {
 								
 								flag = true;
 								
-								if(process.env.NODE_ENV !== "test") {
+								if(process.env.NODE_ENV !== 'test') {
 									setTimeout(() => {
 										self.parse();
 									}, 1000);
@@ -156,7 +156,7 @@ class App {
 		}
 		catch(e) {
 			console.log(e);
-			if(process.env.NODE_ENV !== "test") {
+			if(process.env.NODE_ENV !== 'test') {
 				setTimeout(() => {
 					self.parse();
 				}, 1000);
@@ -166,7 +166,7 @@ class App {
 	}
 }
 
-if(process.env.NODE_ENV !== "test") {
+if(process.env.NODE_ENV !== 'test') {
 	let app = new App();
 }
 

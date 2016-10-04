@@ -1,6 +1,6 @@
 {
-  "name": "kancolle",
-  "version": "0.0.1",
+  "name": "kancolle_pi",
+  "version": "1.0.0",
   "description": "@KanColle_PI",
   "scripts": {
     "start": "pm2 start ./app.json",
