@@ -6,7 +6,10 @@ let request = require('request');
 let cheerio = require('cheerio');
 
 const config = require('../config');
-let twit = new (require('twit'))(config);
+let twit;
+if(config.consumer_key !== '') {
+	twit = new (require('twit'))(config);
+}
 
 let flag = true;
 
@@ -100,36 +103,44 @@ class Parser {
 		
 		try {
 			fs.readFile(imgPath, 'base64', (err, data) => {
-				twit.post('account/update_profile_image', {
-					image: data
-				}, (err, data) => {
-					if(err) {
-						throw new Error(err);
-					}
-					
-					twit.post('media/upload', {
-						media_data: data
-					}, (err, res) => {
+				if(twit === undefined) {
+					setTimeout(() => {
+						self.parse();
+					}, 1000);
+					callback(true);
+				}
+				else {
+					twit.post('account/update_profile_image', {
+						image: data
+					}, (err, data) => {
 						if(err) {
 							throw new Error(err);
 						}
 						
-						twit.post('statuses/update', {
-							media_ids: res.media_id_string
+						twit.post('media/upload', {
+							media_data: data
 						}, (err, res) => {
 							if(err) {
 								throw new Error(err);
 							}
 							
-							flag = true;
-							
-							setTimeout(() => {
-								self.parse();
-							}, 1000);
-							callback(true);
+							twit.post('statuses/update', {
+								media_ids: res.media_id_string
+							}, (err, res) => {
+								if(err) {
+									throw new Error(err);
+								}
+								
+								flag = true;
+								
+								setTimeout(() => {
+									self.parse();
+								}, 1000);
+								callback(true);
+							});
 						});
 					});
-				});
+				}
 			});
 		}
 		catch(e) {
