@@ -10,6 +10,7 @@ sudo: false
 
 script:
   - cp config.sample.js config.js
+  - mkdir data
   - npm test
 
 notifications:
