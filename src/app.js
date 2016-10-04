@@ -14,15 +14,15 @@ if(config.consumer_key !== '') {
 let flag = true;
 
 class Parser {
-	constructor(start) {
+	constructor(test) {
 		let self = this;
 		
-		if(start) {
-			self.parse();
+		if(test === false) {
+			self.parse(false);
 		}
 	}
 
-	parse(callback) {
+	parse(test, callback) {
 		let self = this;
 		
 		if(callback === undefined) {
@@ -44,21 +44,25 @@ class Parser {
 					let ext = img.split('.').pop();
 					img = `${img.split('_')[0]}.${ext}`;
 					
-					self.fetch(img);
+					if(test === false) {
+						self.fetch(false, img);
+					}
 					callback(true);
 				}
 			}
 			catch(e) {
 				console.log(e);
-				setTimeout(() => {
-					self.parse();
-				}, 1000);
+				if(test === false) {
+					setTimeout(() => {
+						self.parse(false);
+					}, 1000);
+				}
 				callback(false);
 			}
 		});
 	}
 	
-	fetch(img, callback) {
+	fetch(test, img, callback) {
 		let self = this;
 		
 		if(callback === undefined) {
@@ -70,7 +74,11 @@ class Parser {
 			
 			if(fs.existsSync(imgPath)) {
 				setTimeout(() => {
-					self.parse();
+					if(test === false) {
+						setTimeout(() => {
+							self.parse(false);
+						}, 1000);
+					}
 					callback(true);
 				}, 1000);
 			}
@@ -81,7 +89,9 @@ class Parser {
 				
 				request.get(url)
 				.on('end', (res) => {
-					self.tweet(imgPath);
+					if(test === false) {
+						self.tweet(false, imgPath);
+					}
 					callback(true);
 				})
 				.pipe(fs.createWriteStream(imgPath));
@@ -89,14 +99,16 @@ class Parser {
 		}
 		catch(e) {
 			console.log(e);
-			setTimeout(() => {
-				self.parse();
-			}, 1000);
+			if(test === false) {
+				setTimeout(() => {
+					self.parse(false);
+				}, 1000);
+			}
 			callback(false);
 		}
 	}
 	
-	tweet(imgPath, callback) {
+	tweet(test, imgPath, callback) {
 		let self = this;
 		
 		if(callback === undefined) {
@@ -106,9 +118,11 @@ class Parser {
 		try {
 			fs.readFile(imgPath, 'base64', (err, data) => {
 				if(twit === undefined) {
-					setTimeout(() => {
-						self.parse();
-					}, 1000);
+					if(test === false) {	
+						setTimeout(() => {
+							self.parse(false);
+						}, 1000);
+					}
 					callback(true);
 				}
 				else {
@@ -135,9 +149,11 @@ class Parser {
 								
 								flag = true;
 								
-								setTimeout(() => {
-									self.parse();
-								}, 1000);
+								if(test === false) {
+									setTimeout(() => {
+										self.parse(false);
+									}, 1000);
+								}
 								callback(true);
 							});
 						});
@@ -148,14 +164,14 @@ class Parser {
 		catch(e) {
 			console.log(e);
 			setTimeout(() => {
-				self.parse();
+				self.parse(false);
 			}, 1000);
 			callback(false);
 		}
 	}
 }
 
-let parser = new Parser(true);
+let parser = new Parser(false);
 
 module.exports = Parser;
 
