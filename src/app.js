@@ -7,7 +7,7 @@ let cheerio = require('cheerio');
 
 const config = require('../config');
 let twit;
-if(config.consumer_key !== '') {
+if(process.env.NODE_ENV !== "test") {
 	twit = new (require('twit'))(config);
 }
 
@@ -17,12 +17,12 @@ class Parser {
 	constructor(test) {
 		let self = this;
 		
-		if(test === false) {
-			self.parse(false);
+		if(process.env.NODE_ENV !== "test") {
+			self.parse();
 		}
 	}
 
-	parse(test, callback) {
+	parse(callback) {
 		let self = this;
 		
 		if(callback === undefined) {
@@ -44,17 +44,17 @@ class Parser {
 					let ext = img.split('.').pop();
 					img = `${img.split('_')[0]}.${ext}`;
 					
-					if(test === false) {
-						self.fetch(false, img);
+					if(process.env.NODE_ENV !== "test") {
+						self.fetch(img);
 					}
 					callback(true);
 				}
 			}
 			catch(e) {
 				console.log(e);
-				if(test === false) {
+				if(process.env.NODE_ENV !== "test") {
 					setTimeout(() => {
-						self.parse(false);
+						self.parse();
 					}, 1000);
 				}
 				callback(false);
@@ -62,7 +62,7 @@ class Parser {
 		});
 	}
 	
-	fetch(test, img, callback) {
+	fetch(img, callback) {
 		let self = this;
 		
 		if(callback === undefined) {
@@ -73,14 +73,12 @@ class Parser {
 			let imgPath = path.join(__dirname, '..', 'data', img.replace('/', '_'));
 			
 			if(fs.existsSync(imgPath)) {
-				setTimeout(() => {
-					if(test === false) {
-						setTimeout(() => {
-							self.parse(false);
-						}, 1000);
-					}
-					callback(true);
-				}, 1000);
+				if(process.env.NODE_ENV !== "test") {
+					setTimeout(() => {
+						self.parse();
+					}, 1000);
+				}
+				callback(true);
 			}
 			else {
 				flag = false;
@@ -89,8 +87,8 @@ class Parser {
 				
 				request.get(url)
 				.on('end', (res) => {
-					if(test === false) {
-						self.tweet(false, imgPath);
+					if(process.env.NODE_ENV !== "test") {
+						self.tweet(imgPath);
 					}
 					callback(true);
 				})
@@ -99,16 +97,16 @@ class Parser {
 		}
 		catch(e) {
 			console.log(e);
-			if(test === false) {
+			if(process.env.NODE_ENV !== "test") {
 				setTimeout(() => {
-					self.parse(false);
+					self.parse();
 				}, 1000);
 			}
 			callback(false);
 		}
 	}
 	
-	tweet(test, imgPath, callback) {
+	tweet(imgPath, callback) {
 		let self = this;
 		
 		if(callback === undefined) {
@@ -117,12 +115,7 @@ class Parser {
 		
 		try {
 			fs.readFile(imgPath, 'base64', (err, data) => {
-				if(twit === undefined) {
-					if(test === false) {	
-						setTimeout(() => {
-							self.parse(false);
-						}, 1000);
-					}
+				if(process.env.NODE_ENV !== "test") {
 					callback(true);
 				}
 				else {
@@ -149,9 +142,9 @@ class Parser {
 								
 								flag = true;
 								
-								if(test === false) {
+								if(process.env.NODE_ENV !== "test") {
 									setTimeout(() => {
-										self.parse(false);
+										self.parse();
 									}, 1000);
 								}
 								callback(true);
@@ -163,15 +156,17 @@ class Parser {
 		}
 		catch(e) {
 			console.log(e);
-			setTimeout(() => {
-				self.parse(false);
-			}, 1000);
+			if(process.env.NODE_ENV !== "test") {
+				setTimeout(() => {
+					self.parse();
+				}, 1000);
+			}
 			callback(false);
 		}
 	}
 }
 
-let parser = new Parser(false);
+let parser = new Parser();
 
 module.exports = Parser;
 

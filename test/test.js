@@ -3,18 +3,18 @@
 var assert = require('assert');
 
 var Parser = require('../src/app');
-var parser = new Parser(true);
+var parser = new Parser();
 
 describe('@drst_bot', function() {
 	it('parse image url', function(done) {
-		parser.parse(true, function(res) {
+		parser.parse(function(res) {
 			assert.equal(res, true);
 			done();
 		});
 	});
 	
 	it('fetch image', function(done) {
-		parser.fetch(true, '780829721672110080/Ay1zs5-p.jpg', function(res) {
+		parser.fetch('780829721672110080/Ay1zs5-p.jpg', function(res) {
 			assert.equal(res, true);
 			done();
 		});
