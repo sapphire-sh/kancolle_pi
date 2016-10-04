@@ -23,6 +23,7 @@ class Parser {
 	}
 
 	parse(callback) {
+console.log(1);
 		let self = this;
 		
 		if(callback === undefined) {
@@ -166,7 +167,9 @@ class Parser {
 	}
 }
 
-let parser = new Parser();
+if(process.env.NODE_ENV !== "test") {
+	let parser = new Parser();
+}
 
 module.exports = Parser;
 
