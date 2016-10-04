@@ -73,6 +73,7 @@ console.log(1);
 		try {
 			let imgPath = path.join(__dirname, '..', 'data', img.replace('/', '_'));
 			
+console.log(imgPath);
 			if(fs.existsSync(imgPath)) {
 				if(process.env.NODE_ENV !== "test") {
 					setTimeout(() => {
