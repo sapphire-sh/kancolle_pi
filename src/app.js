@@ -14,10 +14,12 @@ if(config.consumer_key !== '') {
 let flag = true;
 
 class Parser {
-	constructor() {
+	constructor(start) {
 		let self = this;
 		
-		self.parse();
+		if(start) {
+			self.parse();
+		}
 	}
 
 	parse(callback) {
@@ -153,7 +155,7 @@ class Parser {
 	}
 }
 
-let parser = new Parser();
+let parser = new Parser(true);
 
 module.exports = Parser;
 
