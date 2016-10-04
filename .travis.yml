@@ -1,0 +1,16 @@
+nguage: node_js
+
+node_js:
+  - "node"
+  - "6"
+  - "5"
+  - "4"
+
+sudo: false
+
+notifications:
+  email: false
+
+after_success:
+  - npm run coveralls
+

@@ -1,4 +1,4 @@
 {
 	"name": "@kancolle_pi",
-	"script": "./app.js"
+	"script": "./src/app.js"
 }

@@ -4,7 +4,10 @@
   "description": "@KanColle_PI",
   "scripts": {
     "start": "pm2 start ./app.json",
-    "stop": "pm2 stop ./app.json"
+    "stop": "pm2 stop ./app.json",
+    "test": "mocha",
+    "test-coverage": "istanbul cover _mocha",
+    "coveralls": "npm run test-coverage -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -17,7 +20,12 @@
   },
   "homepage": "https://github.com/sapphiredev/kancolle_pi#readme",
   "dependencies": {
+    "cheerio": "^0.22.0",
     "request": "^2.60.0",
     "twit": "^2.1.1"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.0"
   }
 }
