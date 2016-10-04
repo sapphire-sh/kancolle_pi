@@ -10,6 +10,7 @@ sudo: false
 
 script:
   - echo "module.exports = { consumer_key: '', consumer_secret: '', access_token: '', access_token_secret: '' };" > config.js
+  - npm test
 
 notifications:
   email: false
