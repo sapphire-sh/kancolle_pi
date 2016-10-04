@@ -19,5 +19,12 @@ describe('@drst_bot', function() {
 			done();
 		});
 	});
+	
+	it('fetch image', function(done) {
+		parser.fetch('780829721672110080/Ay1zs5-p.jpg', function(res) {
+			assert.equal(res, true);
+			done();
+		});
+	});
 });
 
