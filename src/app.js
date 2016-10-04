@@ -13,7 +13,7 @@ if(process.env.NODE_ENV !== "test") {
 
 let flag = true;
 
-class Parser {
+class App {
 	constructor(test) {
 		let self = this;
 		
@@ -167,8 +167,8 @@ class Parser {
 }
 
 if(process.env.NODE_ENV !== "test") {
-	let parser = new Parser();
+	let app = new App();
 }
 
-module.exports = Parser;
+module.exports = App;
 
