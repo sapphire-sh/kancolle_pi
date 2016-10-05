@@ -11,26 +11,36 @@ if(process.env.NODE_ENV !== 'test') {
 	twit = new (require('twit'))(config);
 }
 
-let flag = true;
-
 class App {
 	constructor(test) {
 		let self = this;
 		
 		if(process.env.NODE_ENV !== 'test') {
-			self.parse();
+			Promise.resolve(0).then(function loop(i) {
+				console.log(i);
+				
+				return self.parse().then((img) => {
+					return self.fetch(img);
+				}).then((imgPath) => {
+					return self.tweet(imgPath);
+				}).catch((e) => {
+					console.log(e);
+				}).then(() => {
+					return new Promise((resolve, reject) => {
+						setTimeout(() => {
+							resolve(i + 1);
+						}, 1000);
+					});
+				}).then(loop);
+			});
 		}
 	}
 
-	parse(callback) {
+	parse() {
 		let self = this;
 		
-		if(callback === undefined) {
-			callback = () => {};
-		}
-		
-		request('https://mobile.twitter.com/KanColle_STAFF/favorites', function(err, res, body) {
-			try {
+		return new Promise((resolve, reject) => {
+			request('https://mobile.twitter.com/KanColle_STAFF/favorites', function(err, res, body) {
 				if(!err && res.statusCode === 200) {
 					let $ = cheerio.load(body);
 					
@@ -44,84 +54,48 @@ class App {
 					let ext = img.split('.').pop();
 					img = `${img.split('_')[0]}.${ext}`;
 					
-					if(process.env.NODE_ENV !== 'test') {
-						self.fetch(img);
-					}
-					callback(true);
+					resolve(img);
 				}
+				else {
+					reject(err);
+				}
+			});
+		});
+	}
+	
+	fetch(img) {
+		let self = this;
+		
+		return new Promise((resolve, reject) => {
+			let imgPath = path.join(__dirname, '..', 'data', img.replace('/', '_'));
+			
+			if(fs.existsSync(imgPath)) {
+				resolve();
 			}
-			catch(e) {
-				console.log(e);
-				if(process.env.NODE_ENV !== 'test') {
-					setTimeout(() => {
-						self.parse();
-					}, 1000);
-				}
-				callback(false);
+			else {
+				request.get(`https://pbs.twimg.com/profile_images/${img}`).on('end', (res) => {
+					resolve(imgPath);
+				}).pipe(fs.createWriteStream(imgPath));
 			}
 		});
 	}
 	
-	fetch(img, callback) {
+	tweet(imgPath) {
 		let self = this;
 		
-		if(callback === undefined) {
-			callback = () => {};
-		}
-		
-		try {
-			let imgPath = path.join(__dirname, '..', 'data', img.replace('/', '_'));
-			
-			if(fs.existsSync(imgPath)) {
-				if(process.env.NODE_ENV !== 'test') {
-					setTimeout(() => {
-						self.parse();
-					}, 1000);
-				}
-				callback(true);
+		return new Promise((resolve, reject) => {
+			if(imgPath === undefined) {
+				resolve();
 			}
 			else {
-				flag = false;
-				
-				let url = `https://pbs.twimg.com/profile_images/${img}`;
-				
-				request.get(url)
-				.on('end', (res) => {
-					if(process.env.NODE_ENV !== 'test') {
-						self.tweet(imgPath);
+				fs.readFile(imgPath, 'base64', (err, data) => {
+					if(err) {
+						throw new Error(err);
 					}
-					callback(true);
-				})
-				.pipe(fs.createWriteStream(imgPath));
-			}
-		}
-		catch(e) {
-			console.log(e);
-			if(process.env.NODE_ENV !== 'test') {
-				setTimeout(() => {
-					self.parse();
-				}, 1000);
-			}
-			callback(false);
-		}
-	}
-	
-	tweet(imgPath, callback) {
-		let self = this;
-		
-		if(callback === undefined) {
-			callback = () => {};
-		}
-		
-		try {
-			fs.readFile(imgPath, 'base64', (err, data) => {
-				if(process.env.NODE_ENV !== 'test') {
-					callback(true);
-				}
-				else {
+					
 					twit.post('account/update_profile_image', {
 						image: data
-					}, (err, data) => {
+					}, (err, res) => {
 						if(err) {
 							throw new Error(err);
 						}
@@ -140,29 +114,13 @@ class App {
 									throw new Error(err);
 								}
 								
-								flag = true;
-								
-								if(process.env.NODE_ENV !== 'test') {
-									setTimeout(() => {
-										self.parse();
-									}, 1000);
-								}
-								callback(true);
+								resolve();
 							});
 						});
 					});
-				}
-			});
-		}
-		catch(e) {
-			console.log(e);
-			if(process.env.NODE_ENV !== 'test') {
-				setTimeout(() => {
-					self.parse();
-				}, 1000);
+				});
 			}
-			callback(false);
-		}
+		});
 	}
 }
 
